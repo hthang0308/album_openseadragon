@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "name": "API",
+      "script": "./index.js",
+      "instances": 1,
+      "autorestart": false
+    },
+    {
+      "name": "ProcessImage",
+      "script": "./index2.js",
+      "instances": 1,
+      "autorestart": false
+    }
+  ]
+}
