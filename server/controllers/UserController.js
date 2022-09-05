@@ -1,9 +1,9 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const User = require("../models/User");
+const User = require('../models/User');
 
 const checkConstraints = (user) => {
   // check if username has any space
@@ -42,7 +42,7 @@ class UserController {
     const { username, password } = req.body;
     try {
       const existingUser = await User.findOne({ username });
-      if (existingUser) return res.status(400).json({ message: "User already exists" });
+      if (existingUser) return res.status(400).json({ message: 'User already exists' });
       const hashedPassword = await bcrypt.hash(password, 10);
       delete req.body.password;
       const result = await User.create({
@@ -51,10 +51,10 @@ class UserController {
       });
       // const accessToken = jwt.sign(result.username, process.env.ACCESS_TOKEN_SECRET);
       res.status(200).json({
-        message: "Signup successfully",
+        message: 'Signup successfully',
       });
     } catch (err) {
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: 'Server error' });
     }
   }
   // [POST] /api/user/login
@@ -63,28 +63,28 @@ class UserController {
 
     try {
       const existingUser = await User.findOne({ username });
-      if (!existingUser) return res.status(404).json({ message: "User does not exist" });
+      if (!existingUser) return res.status(404).json({ message: 'User does not exist' });
 
       const isCorrectPassword = await bcrypt.compare(password, existingUser.password);
-      if (!isCorrectPassword) return res.status(400).json({ message: "Invalid password" });
+      if (!isCorrectPassword) return res.status(400).json({ message: 'Invalid password' });
 
       const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h", // expires in 1 hour
+        expiresIn: '1h', // expires in 1 hour
       });
       const refreshToken = jwt.sign({ username }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "1y", // expires in 1 year
+        expiresIn: '1y', // expires in 1 year
       });
-      res.cookie("accessToken", accessToken, {
+      res.cookie('accessToken', accessToken, {
         httpOnly: true,
       });
-      res.cookie("refreshToken", refreshToken, {
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
       });
-      res.cookie("isLoggedIn", true, {
+      res.cookie('isLoggedIn', true, {
         maxAge: 1000 * 60 * 60 * 24 * 365,
       });
       res.status(200).json({
-        message: "Login successfully",
+        message: 'Login successfully',
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -95,20 +95,20 @@ class UserController {
     if (!checkConstraints(req.body)) return res.status(400).json({ message: "Given user's information is invalid" });
 
     const { username } = req.body;
-    delete req.body["password"];
+    delete req.body['password'];
 
     try {
       const updatedUser = await User.findOneAndUpdate({ username: username }, req.body, { new: true });
 
-      if (!updatedUser) return res.status(400).json({ message: "User does not exist" });
+      if (!updatedUser) return res.status(400).json({ message: 'User does not exist' });
 
       const accessToken = jwt.sign(updatedUser.username, process.env.ACCESS_TOKEN_SECRET);
 
       res.status(200).json({
-        message: "Change info successfully",
+        message: 'Change info successfully',
       });
     } catch (err) {
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: 'Server error' });
     }
   }
   // [PUT] /api/user/change-password
@@ -117,9 +117,9 @@ class UserController {
     try {
       const username = req.user.username;
       const existingUser = await User.findOne({ username });
-      if (!existingUser) return res.status(400).json({ message: "User does not exist" });
+      if (!existingUser) return res.status(400).json({ message: 'User does not exist' });
       let isCorrectPassword = await bcrypt.compare(currentPassword, existingUser.password);
-      if (!isCorrectPassword) return res.status(400).json({ message: "Wrong password" });
+      if (!isCorrectPassword) return res.status(400).json({ message: 'Wrong password' });
       //isCorrectPassword = newPassword.length >= 6;
       //if (!isCorrectPassword) return res.status(400).json({ message: "New password must be at least 6 characters" });
       const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -130,19 +130,19 @@ class UserController {
       );
       const accessToken = jwt.sign(updatedUser.username, process.env.ACCESS_TOKEN_SECRET);
       res.status(200).json({
-        message: "Change password successfully",
+        message: 'Change password successfully',
       });
     } catch (err) {
       console.log(err);
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: 'Server error' });
     }
   }
   // [POST] /api/user/logout
   async logout(req, res) {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.clearCookie("isLoggedIn");
-    res.status(200).json({ message: "Logout successfully" });
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('isLoggedIn');
+    res.status(200).json({ message: 'Logout successfully' });
   }
 }
 

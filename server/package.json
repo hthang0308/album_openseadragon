@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "deploy": "node index",
-    "start": "pm2 start pm2.json",
+    "start": "npm start index.js",
     "stop": "pm2 delete all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.9",
-    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
